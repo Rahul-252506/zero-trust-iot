@@ -34,16 +34,29 @@ class ZtPolicyEngine;
 class ZtIpv4Hook : public Object
 {
 public:
+  // Registers the class type with ns-3 object system.
+  // Enables runtime identification and integration with simulation framework.
   static TypeId GetTypeId();
 
+  // Constructor initializes hook object.
+  // Prepares internal pointers for node and policy engine.
   ZtIpv4Hook();
+
+  // Destructor cleans up allocated resources.
+  // Ensures proper object lifecycle management.
   virtual ~ZtIpv4Hook();
 
+  // Sets the Zero Trust policy engine instance.
+  // Used for making access control decisions during packet interception.
   void SetPolicyEngine(Ptr<ZtPolicyEngine> engine);
+
+  // Attaches this hook to a specific ns-3 node.
+  // Enables interception of IPv4 traffic for that node.
   void AttachToNode(Ptr<Node> node);
 
 private:
-  // Correct Ipv4 Tx trace signature
+  // Intercepts outgoing IPv4 packets from the node.
+  // Applies policy engine checks before allowing transmission.
   void InterceptPacket(Ptr<const Packet> packet,
                        Ptr<Ipv4> ipv4,
                        uint32_t interface);
@@ -55,4 +68,3 @@ private:
 } // namespace ns3
 
 #endif
-

@@ -32,11 +32,20 @@ namespace ns3 {
 class IdentityRegistry
 {
 public:
+  // Returns the singleton instance of IdentityRegistry.
+  // Ensures only one centralized identity manager exists.
   static IdentityRegistry& GetInstance();
 
+  // Registers a node with a given role.
+  // Generates and stores its identity hash and role mapping.
   void RegisterNode(Ptr<Node> node, const std::string& role);
 
+  // Retrieves the stored identity hash of a node.
+  // Used for verifying node identity during policy checks.
   std::string GetIdentityHash(Ptr<Node> node) const;
+
+  // Retrieves the assigned role of a node.
+  // Used for role-based access control decisions.
   std::string GetRole(Ptr<Node> node) const;
 
 private:
@@ -49,4 +58,3 @@ private:
 }
 
 #endif
-

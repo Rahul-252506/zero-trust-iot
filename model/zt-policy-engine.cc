@@ -1,5 +1,3 @@
-
-
 // === zt-policy-engine.cc ===
 #include "zt-policy-engine.h"
 #include "zt-identity-registry.h"
@@ -23,6 +21,9 @@ NS_LOG_COMPONENT_DEFINE("ZtPolicyEngine");
 NS_OBJECT_ENSURE_REGISTERED(ZtPolicyEngine);
 
 // ===================== TypeId =====================
+
+// Registers the class type with ns-3 object system.
+// Enables runtime type identification and object creation.
 TypeId ZtPolicyEngine::GetTypeId() {
   static TypeId tid = TypeId("ZtPolicyEngine")
     .SetParent<Object>()
@@ -32,35 +33,53 @@ TypeId ZtPolicyEngine::GetTypeId() {
 }
 
 // ===================== Constructor =====================
+
+// Initializes policy engine with default values.
+// Sets initial policy version and prepares internal state.
 ZtPolicyEngine::ZtPolicyEngine()
   : m_policyVersion(0)
 {
 }
 
-// ===================== Destructor (ADDED FIX) =====================
+// ===================== Destructor =====================
+
+// Destructor for cleaning up resources.
+// Ensures proper object lifecycle management.
 ZtPolicyEngine::~ZtPolicyEngine()
 {
 }
 
 // ===================== BASIC AUTH =====================
+
+// Adds a node and its role into the authorization table.
+// Used for basic identity-based access control.
 void ZtPolicyEngine::AddAuthorized(uint32_t nodeId, const std::string& role) {
   authTable[nodeId] = role;
 }
 
+// Verifies if a node has the specified authorized role.
+// Returns true if node exists and role matches.
 bool ZtPolicyEngine::Authorize(uint32_t nodeId, const std::string& role) {
   return authTable.find(nodeId) != authTable.end() &&
          authTable[nodeId] == role;
 }
 
 // ===================== CERTIFICATE =====================
+
+// Stores the CA public key for certificate verification.
+// Used later for validating digital signatures.
 void ZtPolicyEngine::SetCaPublicKey(RSA::PublicKey pub) {
   caPublicKey = pub;
 }
 
+// Adds a node to the revocation list.
+// Prevents further access regardless of credentials.
 void ZtPolicyEngine::Revoke(uint32_t nodeId) {
   revoke.insert(nodeId);
 }
 
+// Verifies certificate authenticity and extracts identity details.
+// Ensures signature validity, role match, and expiry check.
 bool ZtPolicyEngine::AuthorizeWithCert(uint32_t nodeId,
                                        const std::string& role,
                                        const std::string& certStr) {
@@ -126,7 +145,8 @@ bool ZtPolicyEngine::AuthorizeWithCert(uint32_t nodeId,
 
 // ===================== MICRO-SEGMENTATION =====================
 
-// Add rule
+// Adds a new micro-segmentation policy rule.
+// Increments policy version for tracking updates.
 void ZtPolicyEngine::AddRolePolicyRule(const RolePolicyRule& rule) {
   m_rules.push_back(rule);
   m_policyVersion++;
@@ -135,7 +155,8 @@ void ZtPolicyEngine::AddRolePolicyRule(const RolePolicyRule& rule) {
             << m_policyVersion << "\n";
 }
 
-// Time check
+// Checks if current system time is within allowed range.
+// Used to enforce time-based access restrictions.
 bool ZtPolicyEngine::IsWithinTime(uint32_t startHour,
                                  uint32_t endHour) {
   std::time_t now = std::time(nullptr);
@@ -145,7 +166,8 @@ bool ZtPolicyEngine::IsWithinTime(uint32_t startHour,
   return (hour >= startHour && hour < endHour);
 }
 
-// Behavior tracking
+// Tracks recent activity of a node within a time window.
+// Removes outdated entries and returns current count.
 uint32_t ZtPolicyEngine::GetBehaviorState(uint32_t nodeId,
                                           uint32_t windowSeconds) {
   uint64_t now = std::time(nullptr);
@@ -159,7 +181,8 @@ uint32_t ZtPolicyEngine::GetBehaviorState(uint32_t nodeId,
   return history.size();
 }
 
-// Core evaluation
+// Evaluates communication based on micro-segmentation rules.
+// Applies role, time, and behavior constraints to allow/deny.
 bool ZtPolicyEngine::EvaluateMicroSegmentation(
     Ptr<Node> srcNode,
     Ptr<Node> dstNode,
@@ -232,10 +255,15 @@ bool ZtPolicyEngine::EvaluateMicroSegmentation(
 }
 
 // ===================== POLICY INTEGRITY =====================
+
+// Returns the current version of policy configuration.
+// Helps track rule updates and synchronization.
 uint32_t ZtPolicyEngine::GetPolicyVersion() const {
   return m_policyVersion;
 }
 
+// Generates a hash of all policy rules and version.
+// Used to verify integrity and detect modifications.
 std::string ZtPolicyEngine::GetPolicyIntegrityHash() const {
   std::stringstream ss;
 

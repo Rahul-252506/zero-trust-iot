@@ -29,6 +29,8 @@ VIT CHENNAI,INDIA
 
 namespace ns3 {
 
+// Returns the singleton instance of IdentityRegistry.
+// Ensures a single global registry is used across the system.
 IdentityRegistry&
 IdentityRegistry::GetInstance()
 {
@@ -36,6 +38,8 @@ IdentityRegistry::GetInstance()
   return instance;
 }
 
+// Registers a node with its role and computes identity hash.
+// Stores mapping of node ID to role and SHA-256 hash.
 void
 IdentityRegistry::RegisterNode(Ptr<Node> node, const std::string& role)
 {
@@ -45,6 +49,8 @@ IdentityRegistry::RegisterNode(Ptr<Node> node, const std::string& role)
   m_identityMap[node->GetId()] = {role, hash};
 }
 
+// Retrieves the identity hash associated with a node.
+// Returns empty string if node is not found in registry.
 std::string
 IdentityRegistry::GetIdentityHash(Ptr<Node> node) const
 {
@@ -55,6 +61,8 @@ IdentityRegistry::GetIdentityHash(Ptr<Node> node) const
   return "";
 }
 
+// Retrieves the role assigned to a node.
+// Returns empty string if node is not registered.
 std::string
 IdentityRegistry::GetRole(Ptr<Node> node) const
 {
@@ -66,4 +74,3 @@ IdentityRegistry::GetRole(Ptr<Node> node) const
 }
 
 } // namespace ns3
-

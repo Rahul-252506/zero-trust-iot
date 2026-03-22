@@ -31,6 +31,8 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED(ZtIpv4Hook);
 
+// Registers the class type with ns-3 object system.
+// Enables runtime identification and integration.
 TypeId
 ZtIpv4Hook::GetTypeId()
 {
@@ -41,15 +43,24 @@ ZtIpv4Hook::GetTypeId()
   return tid;
 }
 
+// Constructor initializes hook object.
+// Prepares internal state for node and engine attachment.
 ZtIpv4Hook::ZtIpv4Hook() {}
+
+// Destructor cleans up resources.
+// Ensures proper lifecycle management of the object.
 ZtIpv4Hook::~ZtIpv4Hook() {}
 
+// Sets the Zero Trust policy engine instance.
+// Used to evaluate access decisions during packet interception.
 void
 ZtIpv4Hook::SetPolicyEngine(Ptr<ZtPolicyEngine> engine)
 {
   m_engine = engine;
 }
 
+// Attaches this hook to a given node's IPv4 stack.
+// Enables interception of outgoing packets using trace hooks.
 void
 ZtIpv4Hook::AttachToNode(Ptr<Node> node)
 {
@@ -67,6 +78,8 @@ ZtIpv4Hook::AttachToNode(Ptr<Node> node)
       MakeCallback(&ZtIpv4Hook::InterceptPacket, this));
 }
 
+// Intercepts outgoing IPv4 packets from the node.
+// Applies micro-segmentation policy before allowing transmission.
 void
 ZtIpv4Hook::InterceptPacket(
     Ptr<const Packet> packet,
@@ -100,4 +113,3 @@ ZtIpv4Hook::InterceptPacket(
 }
 
 } // namespace ns3
-
